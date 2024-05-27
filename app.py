@@ -50,7 +50,7 @@ def add_heroes():
     Heroes_role = info['role']
     cur.execute("""
         INSERT INTO heroes (name, role)
-        VALUES (%s, %s, %s)
+        VALUES (%s, %s)
         """, (Heroes_name, Heroes_role))
     mysql.connection.commit()
     print("row(s) affected :{}".format(cur.rowcount))
