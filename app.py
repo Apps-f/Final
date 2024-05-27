@@ -84,7 +84,7 @@ def update_heroes(id):
     )
 
 
-@app.route("/branch/<int:id>", methods=["DELETE"])
+@app.route("/heroes/<int:id>", methods=["DELETE"])
 def delete_actor(id):
     cur = mysql.connection.cursor()
     cur.execute(""" DELETE FROM branch where BranchID = %s """, (id,))
