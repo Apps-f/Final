@@ -15,7 +15,7 @@ mysql = MySQL(app)
 auth = HTTPBasicAuth()
 
 users = {
-    "admin": "password"
+    "admin": "pass"
 }
 
 @auth.verify_password
