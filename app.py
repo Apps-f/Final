@@ -1,6 +1,6 @@
-from flask import Flask, make_response,  request, jsonify
+from flask import Flask, make_response, request, jsonify
 from flask_mysqldb import MySQL
-
+from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 
@@ -11,15 +11,32 @@ app.config["MYSQL_PASSWORD"] = "root"
 app.config["MYSQL_DB"] = "dota2"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
-mysql = MySQL(app) 
 
+mysql = MySQL(app)
+
+
+auth = HTTPBasicAuth()
+
+
+
+users = {
+    "admin": "pass"
+}
+
+# Verify user credentials
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and users[username] == password:
+        return username
 
 @app.route("/")
+@auth.login_required
 def hello_world():
     return "<p> Hello World </p>"
 
 
 @app.route("/heroes", methods=["GET"])
+@auth.login_required
 def get_heroes():
     cur = mysql.connection.cursor()
     query = "SELECT * FROM heroes;"
@@ -31,6 +48,7 @@ def get_heroes():
 
 
 @app.route("/heroes/<int:id>", methods=["GET"])
+@auth.login_required
 def get_heroes_by_id(id):
     cur = mysql.connection.cursor()
     query = """
@@ -43,6 +61,7 @@ def get_heroes_by_id(id):
 
 
 @app.route("/heroes", methods=["POST"])
+@auth.login_required
 def add_heroes():
     cur = mysql.connection.cursor()
     info = request.get_json()
@@ -53,15 +72,15 @@ def add_heroes():
         VALUES (%s, %s)
         """, (Heroes_name, Heroes_role))
     mysql.connection.commit()
-    print("row(s) affected :{}".format(cur.rowcount))
     rows_affected = cur.rowcount
     cur.close()
 
-    return make_response(jsonify({"message": "Hero added sucessfully",
+    return make_response(jsonify({"message": "Hero added successfully",
                                   "rows_affected": rows_affected}), 200)
 
 
 @app.route("/heroes/<int:id>", methods=["PUT"])
+@auth.login_required
 def update_heroes(id):
     cur = mysql.connection.cursor()
     info = request.get_json()
@@ -75,6 +94,7 @@ def update_heroes(id):
     mysql.connection.commit()
     rows_affected = cur.rowcount
     cur.close()
+
     return make_response(
         jsonify(
             {"message": "Hero updated successfully",
@@ -85,12 +105,14 @@ def update_heroes(id):
 
 
 @app.route("/heroes/<int:id>", methods=["DELETE"])
+@auth.login_required
 def delete_heroes(id):
     cur = mysql.connection.cursor()
     cur.execute(""" DELETE FROM heroes where id = %s """, (id,))
     mysql.connection.commit()
     rows_affected = cur.rowcount
     cur.close()
+
     return make_response(
         jsonify(
             {"message": "Hero deleted successfully",
@@ -98,7 +120,6 @@ def delete_heroes(id):
         ),
         200,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
