@@ -85,15 +85,15 @@ def update_heroes(id):
 
 
 @app.route("/heroes/<int:id>", methods=["DELETE"])
-def delete_actor(id):
+def delete_heroes(id):
     cur = mysql.connection.cursor()
-    cur.execute(""" DELETE FROM branch where BranchID = %s """, (id,))
+    cur.execute(""" DELETE FROM heroes where id = %s """, (id,))
     mysql.connection.commit()
     rows_affected = cur.rowcount
     cur.close()
     return make_response(
         jsonify(
-            {"message": "actor deleted successfully",
+            {"message": "Hero deleted successfully",
              "rows_affected": rows_affected}
         ),
         200,
