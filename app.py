@@ -77,7 +77,7 @@ def update_heroes(id):
     cur.close()
     return make_response(
         jsonify(
-            {"message": "actor updated successfully",
+            {"message": "Hero updated successfully",
              "rows_affected": rows_affected}
         ),
         200,
