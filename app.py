@@ -61,16 +61,16 @@ def add_heroes():
                                   "rows_affected": rows_affected}), 200)
 
 
-@app.route("/branch/<int:id>", methods=["PUT"])
-def update_actor(id):
+@app.route("/heroes/<int:id>", methods=["PUT"])
+def update_heroes(id):
     cur = mysql.connection.cursor()
     info = request.get_json()
-    Branch_location = info["Branch_Location"]
-    Branch_name = info['Branch_Name']
+    Heroes_name = info["name"]
+    Heroes_role = info["role"]
     cur.execute(
-        """ UPDATE branch SET Branch_location = %s, Branch_Name = %s
-        WHERE BranchID = %s """,
-        (Branch_location, Branch_name, id),
+        """ UPDATE heroes SET name = %s, role = %s
+        WHERE id = %s """,
+        (Heroes_name, Heroes_role, id),
     )
     mysql.connection.commit()
     rows_affected = cur.rowcount
